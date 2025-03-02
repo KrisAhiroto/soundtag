@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Усиление звука</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      text-align: center; 
+      padding-top: 50px;
+      background-color: #f0f0f0;
+    }
+    #playButton {
+      border: none;
+      background: none;
+      padding: 0;
+      cursor: pointer;
+    }
+    #playButton img {
+      width: 600px;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <button id="playButton">
+    <img src="button-image.png" alt="Воспроизвести звук">
+  </button>
+  
+  <audio id="audioPlayer" src="mysound.mp3"></audio>
+
+  <script>
+    document.getElementById('playButton').addEventListener('click', function() {
+      // Создаём AudioContext внутри обработчика клика
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const audioCtx = new AudioContext();
+
+      // Получаем элемент аудио
+      const audioElement = document.getElementById('audioPlayer');
+      
+      // Создаём источник аудио и GainNode для усиления
+      const track = audioCtx.createMediaElementSource(audioElement);
+      const gainNode = audioCtx.createGain();
+      gainNode.gain.value = 2.0; // Усиление звука в 2 раза
+
+      // Подключаем цепочку: источник -> усилитель -> аудиовыход
+      track.connect(gainNode).connect(audioCtx.destination);
+
+      // Запускаем воспроизведение
+      audioElement.play().catch(function(e) {
+        console.error("Ошибка воспроизведения:", e);
+      });
+    });
+  </script>
+</body>
+</html>
