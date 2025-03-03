@@ -5,52 +5,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Усиление звука</title>
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      text-align: center; 
+    body {
+      background-color: #000; /* Чёрный фон */
+      color: #ccc; /* Белый текст, но не слишком яркий */
+      font-family: Arial, sans-serif;
+      text-align: center;
       padding-top: 50px;
-      background-color: #f0f0f0;
+      margin: 0;
     }
-    #playButton {
+    button {
+      background-color: #555; /* Серая кнопка */
+      color: #ccc; /* Белый текст */
       border: none;
-      background: none;
-      padding: 0;
+      padding: 15px 30px;
+      font-size: 18px;
       cursor: pointer;
+      border-radius: 5px;
     }
-    #playButton img {
-      width: 600px;
-      height: auto;
+    button:hover {
+      background-color: #666;
     }
   </style>
 </head>
 <body>
-  <button id="playButton">
-    <img src="button-image.png" alt="Воспроизвести звук">
-  </button>
+  <button id="siteButton">Перейти на сайт</button>
   
-  <audio id="audioPlayer" src="mysound.mp3"></audio>
-
+  <audio id="audioPlayer" src="mysound.mp3" preload="auto"></audio>
+  
   <script>
-    document.getElementById('playButton').addEventListener('click', function() {
-      // Создаём AudioContext внутри обработчика клика
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      const audioCtx = new AudioContext();
-
-      // Получаем элемент аудио
+    document.addEventListener('click', function() {
       const audioElement = document.getElementById('audioPlayer');
-      
-      // Создаём источник аудио и GainNode для усиления
-      const track = audioCtx.createMediaElementSource(audioElement);
-      const gainNode = audioCtx.createGain();
-      gainNode.gain.value = 2.0; // Усиление звука в 2 раза
 
-      // Подключаем цепочку: источник -> усилитель -> аудиовыход
-      track.connect(gainNode).connect(audioCtx.destination);
+      if (!audioElement.audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
 
-      // Запускаем воспроизведение
-      audioElement.play().catch(function(e) {
-        console.error("Ошибка воспроизведения:", e);
-      });
+        const track = audioCtx.createMediaElementSource(audioElement);
+        const gainNode = audioCtx.createGain();
+        gainNode.gain.value = 2.0; // Усиление звука в 2 раза
+
+        track.connect(gainNode).connect(audioCtx.destination);
+        audioElement.audioCtx = audioCtx;
+      }
+
+      // Проверяем, играет ли уже звук, если нет — запускаем
+      if (audioElement.paused) {
+        audioElement.play().catch(e => console.error("Ошибка воспроизведения:", e));
+      }
     });
   </script>
 </body>
